@@ -14,34 +14,35 @@ export default function ForgotPasswordPage() {
   const [success, setSuccess] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+ // In your forgot password page, update handleSubmit:
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError('');
+  setLoading(true);
 
-    if (!email.trim()) {
-      setError('Please enter your email address');
-      setLoading(false);
-      return;
-    }
+  if (!email.trim()) {
+    setError('Please enter your email address');
+    setLoading(false);
+    return;
+  }
 
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Please enter a valid email address');
-      setLoading(false);
-      return;
-    }
+  if (!/\S+@\S+\.\S+/.test(email)) {
+    setError('Please enter a valid email address');
+    setLoading(false);
+    return;
+  }
 
-    try {
-      await authService.forgotPassword(email);
-      setSuccess(true);
-      setSubmittedEmail(email);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to send reset email. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  try {
+    // Use the authService
+    await authService.forgotPassword(email);
+    setSuccess(true);
+    setSubmittedEmail(email);
+  } catch (err: any) {
+    setError(err.message || 'Failed to send reset email. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="forgot-password-page">
       <div className="forgot-password-container">
@@ -126,6 +127,7 @@ export default function ForgotPasswordPage() {
                 >
                   Try another email
                 </button>
+
                 <Link
                   href="/auth/login"
                   className="button-primary"

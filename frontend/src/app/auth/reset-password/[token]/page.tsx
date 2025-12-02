@@ -85,29 +85,29 @@ export default function ResetPasswordPage() {
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError('');
 
-    if (!validateForm()) return;
+  if (!validateForm()) return;
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      await authService.resetPassword(token, formData.password);
-      setSuccess(true);
-      
-      // Redirect to login after 3 seconds
-      setTimeout(() => {
-        router.push('/auth/login');
-      }, 3000);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to reset password. The link may have expired.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  try {
+    // Use the authService
+    await authService.resetPassword(token, formData.password);
+    setSuccess(true);
+    
+    // Redirect to login after 3 seconds
+    setTimeout(() => {
+      router.push('/auth/login');
+    }, 3000);
+  } catch (err: any) {
+    setError(err.message || 'Failed to reset password. The link may have expired.');
+  } finally {
+    setLoading(false);
+  }
+};
   const PasswordRequirement = ({ met, text }: { met: boolean; text: string }) => (
     <div className="requirement-item">
       {met ? (

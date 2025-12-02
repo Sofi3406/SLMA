@@ -9275,3 +9275,93 @@ p {
   color: #9ca3af;
   margin-top: 8px;
 }
+/* Add to your styles */
+.debug-help {
+  margin-top: 10px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border-left: 4px solid #6c757d;
+}
+
+.debug-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #495057;
+}
+
+.debug-steps {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 0.9em;
+  color: #6c757d;
+}
+
+.debug-steps li {
+  margin-bottom: 4px;
+}
+
+.debug-steps code {
+  background: #e9ecef;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 0.85em;
+  color: #d63384;
+}
+.curl-command {
+  margin-top: 10px;
+  background: #2d2d2d;
+  color: #f8f8f2;
+  padding: 10px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85em;
+  overflow-x: auto;
+}
+
+.curl-command pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.curl-command p {
+  margin-bottom: 5px;
+  color: #ccc;
+}
+.fix-options {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+
+.fix-button {
+  padding: 8px 16px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.fix-button:hover {
+  background: #357ae8;
+}
+
+.error-summary-text p {
+  margin: 5px 0;
+  line-height: 1.5;
+}
+
+pre {
+  background: #f5f5f5;
+  padding: 8px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  margin: 5px 0;
+}

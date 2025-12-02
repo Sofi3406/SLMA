@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ChevronDown } from 'lucide-react';
-import { useRouter } from 'next/navigation'; // If using Next.js App Router
+import { useRouter } from 'next/navigation';
 
 // Woredas data
 const woredas = [
@@ -114,141 +115,149 @@ const RegistrationForm = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setSubmitError('');
-  setSuccessMessage('');
-  
-  const validationErrors = validateForm();
-  if (Object.keys(validationErrors).length > 0) {
-    setErrors(validationErrors);
-    return;
-  }
-  
-  setIsLoading(true);
-  
-  try {
-    const { confirmPassword, agreeToTerms, ...registrationData } = formData;
+    e.preventDefault();
+    setSubmitError('');
+    setSuccessMessage('');
     
-    const API_URL = 'http://localhost:5000';
-    const endpoint = `${API_URL}/api/auth/register`;
-    
-    console.log('📤 Sending request to:', endpoint);
-    console.log('📦 Request data:', registrationData);
-    
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(registrationData),
-    });
-    
-    console.log('📥 Response status:', response.status);
-    console.log('📥 Response ok?:', response.ok);
-    
-    // Get response as text first
-    const responseText = await response.text();
-    console.log('📝 RAW RESPONSE TEXT (first 500 chars):', responseText.substring(0, 500));
-    console.log('📝 Response text length:', responseText.length);
-    
-    // Check if response is empty
-    if (!responseText.trim()) {
-      console.error('❌ Response is empty!');
-      throw new Error('Server returned empty response');
-    }
-    
-    // Try to parse JSON
-    let data;
-    try {
-      data = JSON.parse(responseText);
-      console.log('✅ Parsed JSON successfully:', data);
-    } catch (parseError) {
-      console.error('❌ JSON parse error:', parseError);
-      
-      // Log what we actually got
-      console.error('❌ First 200 chars of response:', responseText.substring(0, 200));
-      
-      // Check for common issues
-      if (responseText.includes('<!DOCTYPE') || responseText.includes('<html>')) {
-        console.error('❌ Response contains HTML - backend might be returning error page');
-        throw new Error('Backend returned HTML instead of JSON. Check if Express server is configured correctly.');
-      }
-      
-      if (responseText.includes('Cannot POST') || responseText.includes('Cannot GET')) {
-        console.error('❌ Route not found on backend');
-        throw new Error('Route not found on server. Check if /api/auth/register route exists.');
-      }
-      
-      if (responseText.includes('MongoError') || responseText.includes('Mongo')) {
-        console.error('❌ MongoDB error');
-        throw new Error('Database connection error. Check MongoDB is running.');
-      }
-      
-      throw new Error(`Server returned invalid JSON. Response: "${responseText.substring(0, 100)}..."`);
-    }
-    
-    if (!response.ok) {
-      console.error('❌ Server returned error status:', response.status);
-      if (data.errors) {
-        setErrors(data.errors);
-      } else if (data.message) {
-        setSubmitError(data.message);
-      } else {
-        setSubmitError(`Registration failed with status: ${response.status}`);
-      }
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
     
-    // SUCCESS! 🎉
-    console.log('🎉 Registration successful:', data);
+    setIsLoading(true);
     
-    setSuccessMessage(
-      data.message || 
-      'Registration successful! Please check your email for verification. ' +
-      'You can now login with your credentials.'
-    );
-    
-    // Clear form
-    setFormData({
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      phone: '',
-      woreda: '',
-      language: language,
-      agreeToTerms: false,
-    });
-    
-    setErrors({});
-    
-    // Store token and user data if provided
-    if (data.token) {
-      localStorage.setItem('slma_token', data.token);
-      localStorage.setItem('slma_user', JSON.stringify(data.user));
-      console.log('🔐 User data stored in localStorage');
+    try {
+      const { confirmPassword, agreeToTerms, ...registrationData } = formData;
+      
+      const API_URL = 'http://localhost:5000';
+      const endpoint = `${API_URL}/api/auth/register`;
+      
+      console.log('Sending request to:', endpoint);
+      console.log('Request data:', registrationData);
+      
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(registrationData),
+      });
+      
+      // Get response as text first
+      const responseText = await response.text();
+      console.log('Response status:', response.status);
+      console.log('Raw response (first 500 chars):', responseText.substring(0, 500));
+      
+      let data;
+      
+      // Handle empty response
+      if (!responseText.trim()) {
+        console.error('Response is empty');
+        if (response.ok) {
+          // If response is empty but status is OK, assume success
+          data = { success: true, message: 'Registration successful' };
+        } else {
+          throw new Error('Server returned empty response');
+        }
+      } else {
+        // Try to parse JSON
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error('JSON parse error:', parseError);
+          
+          // Check what we actually got
+          if (responseText.includes('<html') || responseText.includes('<!DOCTYPE')) {
+            throw new Error('Server returned HTML instead of JSON. Check backend configuration.');
+          } else if (responseText.includes('Cannot POST') || responseText.includes('404')) {
+            throw new Error(`Endpoint not found: ${endpoint}`);
+          } else {
+            throw new Error(`Invalid server response: ${responseText.substring(0, 100)}`);
+          }
+        }
+      }
+      
+      console.log('Parsed data:', data);
+      
+      if (!response.ok) {
+        // Handle backend validation errors
+        if (data.errors) {
+          setErrors(data.errors);
+        } else if (data.message) {
+          setSubmitError(data.message);
+        } else {
+          setSubmitError(`Registration failed (Status: ${response.status})`);
+        }
+        return;
+      }
+      
+      // SUCCESS! 🎉
+      console.log('Registration successful:', data);
+      
+      setSuccessMessage(
+        data.message || 
+        'Registration successful! Please check your email for verification.'
+      );
+      
+      // Clear form
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        phone: '',
+        woreda: '',
+        language: language,
+        agreeToTerms: false,
+      });
+      
+      setErrors({});
+      
+      // Store token and user data if provided
+      if (data.token) {
+        localStorage.setItem('slma_token', data.token);
+        localStorage.setItem('slma_user', JSON.stringify(data.user));
+        console.log('User data stored in localStorage');
+      }
+      
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      
+      // Handle specific error types
+      if (error.message.includes('Failed to fetch')) {
+        setSubmitError(
+          'Cannot connect to server. Please check:\n' +
+          '1. Backend server is running on http://localhost:5000\n' +
+          '2. No firewall blocking the connection\n' +
+          '3. Run: node server.js in your backend folder'
+        );
+      } else if (error.message.includes('CORS')) {
+        setSubmitError(
+          'CORS error. Add this to your backend server.js:\n' +
+          'const cors = require("cors");\n' +
+          'app.use(cors({ origin: "http://localhost:3000" }));'
+        );
+      } else if (error.message.includes('HTML')) {
+        setSubmitError(
+          'Backend is returning HTML error page.\n' +
+          'Check backend console for errors.\n' +
+          'Make sure your Express app has proper error handling.'
+        );
+      } else if (error.message.includes('Endpoint not found')) {
+        setSubmitError(
+          `API endpoint not found.\n` +
+          `Make sure your backend has route: POST /api/auth/register\n` +
+          `Current URL: http://localhost:5000/api/auth/register`
+        );
+      } else {
+        setSubmitError(error.message || 'Registration failed. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
     }
-    
-  } catch (error: any) {
-    console.error('💥 Registration error:', error);
-    console.error('💥 Error stack:', error.stack);
-    
-    // Handle specific error types
-    if (error.message.includes('Failed to fetch')) {
-      setSubmitError('Cannot connect to server. Make sure: 1) Backend is running, 2) Server is on http://localhost:5000, 3) No firewall blocking');
-    } else if (error.message.includes('CORS')) {
-      setSubmitError('CORS error. Check browser console for details. Add CORS middleware to backend.');
-    } else if (error.message.includes('HTML')) {
-      setSubmitError('Backend is returning HTML error page. Check server logs.');
-    } else if (error.message.includes('Route not found')) {
-      setSubmitError('Backend route /api/auth/register not found. Check routes configuration.');
-    } else {
-      setSubmitError(error.message || 'Registration failed. Check console for details.');
-    }
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
+
   return (
     <form onSubmit={handleSubmit} className="registration-form" noValidate>
       {/* Success message */}
@@ -262,7 +271,7 @@ const RegistrationForm = () => {
               <button
                 type="button"
                 className="success-button primary"
-                onClick={() => router.push('/login')}
+                onClick={() => router.push('/auth/login')}
               >
                 Go to Login
               </button>
@@ -283,6 +292,19 @@ const RegistrationForm = () => {
         <div className="error-summary">
           <p className="error-summary-title">Registration Error</p>
           <p className="error-summary-text">{submitError}</p>
+          <div className="debug-help">
+            <p className="debug-title">Troubleshooting:</p>
+            <ol className="debug-steps">
+              <li>Open browser console (F12) and check for errors</li>
+              <li>Verify backend is running: <code>node server.js</code></li>
+              <li>
+                Test with curl:
+                <pre>
+                  {`curl -X POST http://localhost:5000/api/auth/register \\\n  -H "Content-Type: application/json" \\\n  -d '{"name":"Test","email":"test@test.com","password":"Password123","phone":"+251911223344","woreda":"worabe","language":"en"}'`}
+                </pre>
+              </li>
+            </ol>
+          </div>
         </div>
       )}
       
@@ -419,7 +441,7 @@ const RegistrationForm = () => {
               value={formData.phone}
               onChange={handleChange}
               className={`input-field ${errors.phone ? 'input-error' : ''}`}
-              placeholder="+251 911 223344"
+              placeholder="+251 93 067 0088"
               disabled={isLoading}
               aria-describedby={errors.phone ? 'phone-error' : undefined}
             />
@@ -517,9 +539,9 @@ const RegistrationForm = () => {
           <div className="form-footer">
             <p className="form-footer-text">
               Already have an account?{' '}
-              <a href="/login" className="form-footer-link">
+              <Link href="/auth/login" className="form-footer-link">
                 Sign in here
-              </a>
+              </Link>
             </p>
             <p className="form-footer-note">
               * Required fields
