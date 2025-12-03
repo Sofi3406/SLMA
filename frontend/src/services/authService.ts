@@ -30,13 +30,29 @@ export interface User {
   emailVerified: boolean;
 }
 
+// Helper functions with SSR safety
+const safeLocalStorage = {
+  getItem: (key: string): string | null => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(key);
+  },
+  setItem: (key: string, value: string): void => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(key, value);
+  },
+  removeItem: (key: string): void => {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(key);
+  }
+};
+
 export const authService = {
   // Register user
   register: async (data: RegisterData) => {
     const response = await api.post('/auth/register', data);
     if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      safeLocalStorage.setItem('slma_token', response.data.token);
+      safeLocalStorage.setItem('slma_user', JSON.stringify(response.data.user));
     }
     return response.data;
   },
@@ -45,30 +61,28 @@ export const authService = {
   login: async (data: LoginData) => {
     const response = await api.post('/auth/login', data);
     if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      safeLocalStorage.setItem('slma_token', response.data.token);
+      safeLocalStorage.setItem('slma_user', JSON.stringify(response.data.user));
     }
     return response.data;
   },
 
   // Logout user
   logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    safeLocalStorage.removeItem('slma_token');
+    safeLocalStorage.removeItem('slma_user');
     window.location.href = '/';
   },
 
   // Get current user
   getCurrentUser: (): User | null => {
-    if (typeof window === 'undefined') return null;
-    const userStr = localStorage.getItem('user');
+    const userStr = safeLocalStorage.getItem('slma_user');
     return userStr ? JSON.parse(userStr) : null;
   },
 
   // Get token
   getToken: (): string | null => {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('token');
+    return safeLocalStorage.getItem('slma_token');
   },
 
   // Check if user is authenticated
@@ -98,8 +112,13 @@ export const authService = {
   updateProfile: async (data: Partial<RegisterData>) => {
     const response = await api.put('/auth/update-profile', data);
     if (response.data.user) {
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      safeLocalStorage.setItem('slma_user', JSON.stringify(response.data.user));
     }
     return response.data;
+  },
+
+  // Alias for getCurrentUser
+  getUser: (): User | null => {
+    return authService.getCurrentUser();
   },
 };

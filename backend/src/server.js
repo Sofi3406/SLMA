@@ -5,9 +5,13 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
 import errorHandler from './middlewares/errorHandler.js';
+import dashboardRoutes from './routes/dashboard.js';
+import eventRoutes from './routes/events.js';
+
 
 // Import routes
 import authRoutes from './routes/auth.js';
+
 
 // Import email service
 import { testEmailService } from './services/emailService.js';
@@ -45,6 +49,7 @@ const corsOptions = {
 
 // Apply CORS middleware
 app.use(cors(corsOptions));
+
 
 // Handle preflight requests for all routes
 app.options('*', cors(corsOptions));
