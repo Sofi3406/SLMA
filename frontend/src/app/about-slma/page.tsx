@@ -4,7 +4,7 @@ export default function AboutSLMAPage() {
       {/* Hero Section */}
       <section className="hero-section">
         <div className="container">
-          <h1 className="hero-title">Silte Ləmat Mehber (SLMA)</h1>
+          <h1 className="hero-title">Silte Lmat Mehber (SLMA)</h1>
           <p className="hero-subtitle">Building Our Community, Shaping Our Future</p>
         </div>
       </section>
@@ -45,7 +45,7 @@ export default function AboutSLMAPage() {
             
             <div className="history-content">
               <p className="paragraph">
-                Silte Ləmat Mehber (SLMA) was founded in 1998 by visionary Silte community leaders 
+                Silte Lmat Mehber (SLMA) was founded in 1998 by visionary Silte community leaders 
                 who recognized the need for organized development efforts to address the challenges 
                 facing our people. What began as a small initiative has grown into one of the most 
                 impactful community organizations in the region.

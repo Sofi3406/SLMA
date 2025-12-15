@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <rect width="100%" height="100%" fill="#eef2ff"/>
-  <path d="M20,100 C60,20 140,20 180,100 C140,180 60,180 20,100 Z" fill="#60a5fa">
-    <animate attributeName="fill" values="#60a5fa;#93c5fd;#60a5fa" dur="5s" repeatCount="indefinite"/>
-  </path>
-</svg>

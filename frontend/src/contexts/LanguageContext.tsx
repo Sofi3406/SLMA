@@ -28,7 +28,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.logout': 'Logout',
     
     // Hero Section
-    'hero.title': 'Silte Ləmat Mehber',
+    'hero.title': 'Silte Lmat Mehber',
     'hero.subtitle': 'Preserving heritage, building community, creating future',
     'hero.cta.register': 'Become a Member',
     'hero.cta.learn': 'Learn More',

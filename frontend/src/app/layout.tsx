@@ -6,7 +6,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 
 export const metadata: Metadata = {
   title: 'Silte Lmat Mehber - Preserving Heritage, Building Community',
-  description: 'Official platform for Silte Ləmat Mehber community.',
+  description: 'Official platform for Silte Lmat Mehber community.',
 };
 
 export default function RootLayout({

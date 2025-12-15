@@ -129,7 +129,7 @@ const Footer = () => {
         {/* Copyright & Bottom */}
         <div className="footer-bottom">
           <div className="copyright">
-            © {currentYear} Silte Ləmat Mehber. All rights reserved.
+            © {currentYear} Silte Lmat Mehber. All rights reserved.
           </div>
           <div className="footer-bottom-links">
             <Link href="/privacy" className="bottom-link">
